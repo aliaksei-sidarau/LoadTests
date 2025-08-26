@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadAnalyzer", "LoadAnalyzer\LoadAnalyzer.csproj", "{D449C1C6-9105-DB6D-C630-FAB720CEDCD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeServer", "BeServer\BeServer.csproj", "{A8F3DB52-90CF-4641-AB7A-88CC440FAA64}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D449C1C6-9105-DB6D-C630-FAB720CEDCD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D449C1C6-9105-DB6D-C630-FAB720CEDCD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D449C1C6-9105-DB6D-C630-FAB720CEDCD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D449C1C6-9105-DB6D-C630-FAB720CEDCD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F3DB52-90CF-4641-AB7A-88CC440FAA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F3DB52-90CF-4641-AB7A-88CC440FAA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F3DB52-90CF-4641-AB7A-88CC440FAA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F3DB52-90CF-4641-AB7A-88CC440FAA64}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3DB97C1F-AB49-4EBF-97D9-A3082B903F4F}
+	EndGlobalSection
+EndGlobal

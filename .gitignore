@@ -23,6 +23,11 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Data files
+*.log
+_data/output/
+__pycache__/
+
 # .NET Core
 project.lock.json
 project.fragment.lock.json
