@@ -11,7 +11,7 @@ using BeServer;
 using var rsa = RSA.Create(2048);
 using var certificate = Certificate.CreateX509SelfSigned(rsa, useForServer: true);
 
-var listener = new TcpListener(IPAddress.Loopback, 8444);
+var listener = new TcpListener(IPAddress.Any, 8444);
 listener.Start();
 Console.WriteLine("TCP server listening on 127.0.0.1:8444");
 

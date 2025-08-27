@@ -101,6 +101,7 @@ async def main():
     
     # Load test parameters (for check)
     #args.agents = 1
+    #args.host = '192.168.128.28'
     #args.event_batch = 100
     #args.target_eps = 4000
     #args.warmup_min = 0

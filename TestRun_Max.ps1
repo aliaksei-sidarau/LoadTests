@@ -22,7 +22,7 @@ function Run_LoadTest {
     Write-Host "Run_LoadTest -Agents $Agents -EventBatch $EventBatch -Eps $Eps" -ForegroundColor Magenta
 
     python Agent_MaxLoad.py --agents $Agents --event-batch $EventBatch --target-eps $Eps `
-        --save-to _data/output/results_maxBe_r.csv --warmup-min $WarmupMin --step-min 0.5 --step-inc 0.1 --slo-p95-sec 30.0 `
+        --save-to results_maxBe_r.csv --warmup-min $WarmupMin --step-min 0.5 --step-inc 0.1 --slo-p95-sec 30.0 `
         --token MG2LIICYMYF4ANGRNUSQXWYAZTSK67DHSBFDRCZWEBQZEB6RUJKQ
     if ($LASTEXITCODE -ne 0) { Write-Host "Python script failed"; exit 1 }
 }
@@ -82,5 +82,3 @@ Run_LoadTest -Agents 10000 -EventBatch 1000 -Eps 10000000
 Run_LoadTest -Agents 10000 -EventBatch 3000 -Eps 10000000
 Run_LoadTest -Agents 10000 -EventBatch 5000 -Eps 10000000
 #>
-
-Run_LoadTest -Agents 1 -EventBatch 10 -Eps 10000000

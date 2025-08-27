@@ -1,6 +1,7 @@
 import asyncio
 import collections
 import ssl
+import socket
 import secrets
 import datetime
 import logging
@@ -156,12 +157,45 @@ class AgentConfig:
     def ssl_context(self): return self._ssl_ctx
 
 class AgentMessageHelper:
-    @staticmethod
-    async def send_id_message(
-        writer: asyncio.StreamWriter,
-        name: str, peerid: str, token: str) -> None:
 
-        id_msg = """{
+    @staticmethod
+    async def send_message(writer: asyncio.StreamWriter, msg: str) -> None:
+        if writer is None:
+            return
+        msg_bytes = msg.encode()
+        msg_len = len(msg_bytes).to_bytes(4, byteorder="big")
+        writer.write(msg_len + msg_bytes)
+        await writer.drain()
+
+    @staticmethod
+    async def read_message(reader: asyncio.StreamReader) -> str:
+        if reader is None:
+            return ""
+        size_bytes = await reader.readexactly(4)
+        size = int.from_bytes(size_bytes, byteorder="big")
+        echo_data = await reader.readexactly(size)
+        return echo_data.decode("utf-8")
+
+    @staticmethod
+    def send_sock_message(sock: socket.socket, msg: str) -> None:
+        if sock is None:
+            return
+        msg_bytes = msg.encode()
+        msg_len = len(msg_bytes).to_bytes(4, byteorder="big")
+        sock.sendall(msg_len + msg_bytes)
+
+    @staticmethod
+    def read_sock_message(sock: socket.socket) -> str:
+        if sock is None:
+            return ""
+        size_bytes = sock.recv(4)
+        size = int.from_bytes(size_bytes, byteorder="big")
+        echo_data = sock.recv(size)
+        return echo_data.decode("utf-8")        
+
+    @staticmethod
+    def make_id_msg(name: str, peerid: str, token: str) -> str:
+        return """{
             "bind_port": 22676,
             "can_restart": false,
             "client_token": "",
@@ -198,25 +232,6 @@ class AgentMessageHelper:
             "uiv": "3.5.0.1111",
             "v": "3.5.0.1111"
         }""".replace('%NAME%', name).replace('%PEERID%', peerid).replace('%TOKEN%', token)
-        await AgentMessageHelper.send_message(writer, id_msg)
-
-    @staticmethod
-    async def send_message(writer: asyncio.StreamWriter, msg: str) -> None:
-        if writer is None:
-            return
-        msg_bytes = msg.encode()
-        msg_len = len(msg_bytes).to_bytes(4, byteorder="big")
-        writer.write(msg_len + msg_bytes)
-        await writer.drain()
-
-    @staticmethod
-    async def read_message(reader: asyncio.StreamReader) -> str:
-        if reader is None:
-            return ""
-        size_bytes = await reader.readexactly(4)
-        size = int.from_bytes(size_bytes, byteorder="big")
-        echo_data = await reader.readexactly(size)
-        return echo_data.decode("utf-8")
 
     @staticmethod
     def make_event(ts: int) -> str:
@@ -264,8 +279,9 @@ class AgentSocket:
             self._reader, self._writer = await asyncio.open_connection(
                 self._config.host, self._config.port, ssl=self._config.ssl_context
             )
-            await AgentMessageHelper.send_id_message(
-                self._writer, self._name, self._peerid, self._config.token)
+            
+            auth_msg = AgentMessageHelper.make_id_msg(self._name, self._peerid, self._config.token) 
+            await AgentMessageHelper.send_id_message(self._writer, auth_msg)
 
             while not self._app_state.stopped:
                 msg = await AgentMessageHelper.read_message(self._reader)

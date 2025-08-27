@@ -21,9 +21,13 @@ This is a C# app to to analyse test output, e.g.
 1. Build heatmap f(x, y) = BestEPS(Agents-Count, Batch-Size)
 2. Draw some graphics, etc.
 
-# Tuning
+# Tuning OS
 
-Win, check:
-netsh int ipv4 show dynamicport tcp
-netsh int ipv4 set dynamicport tcp start=10000 num=55535
+## Windows
+Check you can have enough descriptors:
+```netsh int ipv4 show dynamicport tcp
+```netsh int ipv4 set dynamicport tcp start=10000 num=55535
+
+Set execution policy to run script
+```Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
