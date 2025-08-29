@@ -110,7 +110,7 @@ async def main():
     #args.slo_p95_sec = 0.5
     #args.slo_err_rate = 0.01
 
-    config = AgentConfig(args.host, args.port, args.token)
+    config = AgentConfig(args.host, args.port, args.token, args.event_batch)
     app_state = AppState(args.agents, args.event_batch)
 
     agents = [AgentSocket(config, app_state) for _ in range(args.agents)]
@@ -134,7 +134,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        #Uvloop does not support windows
+        #Uvloop is not supported on windows
         #import uvloop
         #asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
         asyncio.run(main())

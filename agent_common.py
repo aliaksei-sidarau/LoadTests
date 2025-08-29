@@ -13,13 +13,12 @@ from typing import Optional
 # App state and stats
 # -----------------------------
 class AppState:
-    def __init__(self, agents_count: int, events_per_batch: int) -> None:
+    def __init__(self, agents_count: int) -> None:
         self._stop = False
         self._ready = False
         self._agents_approved = 0
 
         self._agents_count = agents_count
-        self._events_per_batch = events_per_batch
         self._rate_limit_total_eps = 0.0  # total events/sec budget across all agents, live-updated
 
         # Stats
@@ -43,10 +42,6 @@ class AppState:
     @property
     def ready(self) -> bool:
         return self._ready
-
-    @property
-    def events_per_batch(self) -> int:
-        return self._events_per_batch
 
     @property
     def rate_limit_per_agent_eps(self) -> float:
@@ -138,10 +133,11 @@ class FileHelper:
 # Agent logic
 # -----------------------------
 class AgentConfig:
-    def __init__(self, host, port, token) -> None:
+    def __init__(self, host, port, token, batch_size: int = 10) -> None:
         self._host = host
         self._port = port
         self._token = token
+        self._batch_size = batch_size
 
         self._ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self._ssl_ctx.check_hostname = False
@@ -153,6 +149,12 @@ class AgentConfig:
     def port(self): return self._port
     @property
     def token(self): return self._token
+    @property
+    def batch_size(self):
+        return self._batch_size
+    @batch_size.setter
+    def batch_size(self, value: int):
+        self._batch_size = value
     @property
     def ssl_context(self): return self._ssl_ctx
 
@@ -335,7 +337,7 @@ class AgentSocket:
         await asyncio.sleep(1)
         #self._log(f"Start to send messages. EPS per agent={self._app_state.rate_limit_per_agent_eps}")
 
-        events_per_batch = self._app_state.events_per_batch
+        events_per_batch = self._config.batch_size
         while self._ready:
             # honor "one in flight" rule
             if self._confirmationFuture:
