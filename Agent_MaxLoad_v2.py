@@ -137,11 +137,13 @@ async def keyboard_listener(config: AgentConfig, agent_tasks: list, stop_event: 
             is_increase = True if user_input == '+' else False
             config.batch_size = get_next_size(config.batch_size, is_increase)
             print(f"Batch size changed to {config.batch_size} ---")
+            g_events_window.clear()
         elif user_input == '+10' or user_input == '+100':
             agents_count = len(agent_tasks) + 10 if user_input == '+10' else len(agent_tasks) + 100
             await change_agents_count(
                 config, agent_tasks, agents_count, args.spawn_rate, stop_event)
             print(f"Agents count changed to {agents_count} agents ---")
+            g_events_window.clear()
         elif user_input == 'q':
             print("Exiting keyboard listener. ---")
             stop_event.set()
