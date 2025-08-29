@@ -17,11 +17,13 @@ function Run_LoadTest_v2 {
     #docker cp $HostPath "$($ContainerId):$($ContainerPath)/reporting.db"
     #if ($LASTEXITCODE -ne 0) { Write-Host "docker cp failed"; exit 1 }
 
-    Write-Host "Run_LoadTest -Agents $Agents -EventBatch $EventBatch -ForegroundColor Magenta"
+    Write-Host "Run_LoadTest -Agents $Agents -EventBatch $EventBatch" -ForegroundColor Magenta
 
     python Agent_MaxLoad_v2.py --agents $Agents --event-batch $EventBatch `
         --save-to results_v2.csv --spawn-rate 10 `
-        --token SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ --host 192.168.128.28
+        --token SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ --host 127.0.0.1
+        #--token SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ --host 192.168.128.28
+        
     if ($LASTEXITCODE -ne 0) { Write-Host "Python script failed"; exit 1 }
 }
 
@@ -30,4 +32,6 @@ Write-Host "Starting tests at $(Get-Date)"
 Write-Host "Report will be saved to results_v2.csv"
 Write-Host "=============================="
 
-Run_LoadTest_v2 -Agents 10 -EventBatch 100
+Run_LoadTest_v2 -Agents 1 -EventBatch 1
+Run_LoadTest_v2 -Agents 10 -EventBatch 1
+Run_LoadTest_v2 -Agents 100 -EventBatch 1

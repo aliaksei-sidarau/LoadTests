@@ -8,12 +8,13 @@ using System.Text;
 using BeServer;
 
 
+var connectedClientsCount = 0;
 using var rsa = RSA.Create(2048);
 using var certificate = Certificate.CreateX509SelfSigned(rsa, useForServer: true);
 
 var listener = new TcpListener(IPAddress.Any, 8444);
 listener.Start();
-Console.WriteLine("TCP server listening on 127.0.0.1:8444");
+Console.WriteLine("TCP server listening on 0.0.0.0:8444 (any)");
 
 while (true)
 {
@@ -22,7 +23,7 @@ while (true)
 }
 
 async Task HandleClientAsync(TcpClient client, X509Certificate2 certificate)
-{   
+{
     using var netStream = client.GetStream();
     using var sslStream = new SslStream(netStream, false);
     try
@@ -39,11 +40,14 @@ async Task HandleClientAsync(TcpClient client, X509Certificate2 certificate)
         return;
     }
 
+    Console.Write($"Connected: {++connectedClientsCount} total\r");
+
     // First message: connect
     var msg = await ReadMessageAsync(sslStream);
     if (msg == null)
     {
         client.Close();
+        Console.Write($"Connected: {--connectedClientsCount} total\r");
         return;
     }
 
@@ -67,6 +71,7 @@ async Task HandleClientAsync(TcpClient client, X509Certificate2 certificate)
         }
     }
     client.Close();
+    Console.Write($"Connected: {--connectedClientsCount} total\r");
 }
 
 async Task<string> ReadMessageAsync(Stream stream)
