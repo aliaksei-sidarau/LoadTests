@@ -17,14 +17,14 @@ def parse_args():
     return p.parse_args()
 
 # global data
-# --- Скользящее окно для подсчета events/sec ---
-g_events_window: deque = deque(maxlen=50000)
+# --- Sliding window to count events/sec ---
+g_events_window: deque = deque(maxlen=5000)
 g_agent_config: AgentConfig = None
 g_stop_event: asyncio.Event = None
 g_agent_tasks: list = []
 args = parse_args()
 
-# --- TCP-клиент с корректной остановкой ---
+# --- TCP client with graceful shutdown ---
 async def tcp_client(config: AgentConfig, stop_event):
     writer = None
     confirmation_id = 0
@@ -63,7 +63,7 @@ async def tcp_client(config: AgentConfig, stop_event):
             writer.close()
             await writer.wait_closed()
 
-# --- Помощник TCP-клиента --- #
+# --- Helper for TCP client --- #
 class TcpClientHelper:
     @staticmethod
     async def authenticate(client_id: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, token: str, max_try: int = 3) -> None:
@@ -86,13 +86,15 @@ class TcpClientHelper:
     async def read_batch_ack_msg(reader: asyncio.StreamReader, max_try: int = 3):
         msg = await AgentMessageHelper.read_message(reader)
         while not '"m":"confirm"' in msg:
+            if not '"m":"policy"' in msg:
+                print(f"Unexpected message instead of batch ACK: {msg}")
             max_try -= 1
             if max_try <= 0:
                 return None
             msg = await AgentMessageHelper.read_message(reader)
         return msg
 
-# --- Монитор rps и event loop lag ---
+# --- Monitor rps and event loop lag ---
 async def monitor(config: AgentConfig, agent_tasks: list, stop_event):
     while not stop_event.is_set():
         start = time.time()
@@ -103,16 +105,17 @@ async def monitor(config: AgentConfig, agent_tasks: list, stop_event):
         rps = 0.0
         if len(g_events_window) > 1:
             duration = now - g_events_window[0]
-            rps = len(g_events_window) / duration if duration > 0 else 0
-            #g_events_window.clear()
+            rps = (len(g_events_window) / duration) if duration > 0 else 0
 
         tasks_count = len(agent_tasks)
         print(f"Users: {tasks_count}, Epb: {config.batch_size}, " +
               f"Req/s: {rps:.2f}, Events/sec: {rps * config.batch_size:.2f}, "+
               f"Event loop lag: {lag:.2f}ms", end='\r')
-        await asyncio.sleep(2)
 
-# --- Постепенное наращивание агентов ---
+        g_events_window.clear()
+        await asyncio.sleep(4)
+
+# --- Step-by-step ramp-up agents count ---
 async def change_agents_count(config: AgentConfig, agent_tasks: list, target_agents, spawn_rate, stop_event):
     should_ramp_up = len(agent_tasks) < target_agents
     if not should_ramp_up:
@@ -137,13 +140,11 @@ async def keyboard_listener(config: AgentConfig, agent_tasks: list, stop_event: 
             is_increase = True if user_input == '+' else False
             config.batch_size = get_next_size(config.batch_size, is_increase)
             print(f"Batch size changed to {config.batch_size} ---")
-            g_events_window.clear()
         elif user_input == '+10' or user_input == '+100':
             agents_count = len(agent_tasks) + 10 if user_input == '+10' else len(agent_tasks) + 100
             await change_agents_count(
                 config, agent_tasks, agents_count, args.spawn_rate, stop_event)
             print(f"Agents count changed to {agents_count} agents ---")
-            g_events_window.clear()
         elif user_input == 'q':
             print("Exiting keyboard listener. ---")
             stop_event.set()
@@ -160,7 +161,7 @@ def get_next_size(current_size, is_increase: bool = True):
                 return x
     return current_size
 
-# --- Основная функция ---
+# --- Main ---
 
 async def main():    
     #args.agents = 1
