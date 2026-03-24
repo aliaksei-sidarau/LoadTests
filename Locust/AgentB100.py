@@ -1,8 +1,9 @@
-from locust import run_single_user, between, LoadTestShape
+from locust import constant, between
+from locust import run_single_user, LoadTestShape
 from AgentUser import AgentUser
 
 class AgentB100(AgentUser):
-    batch_size = 100
+    batch_size = constant(100)
     wait_time = between(0.9, 1.1)
     
 class StageShape(LoadTestShape):
@@ -10,8 +11,8 @@ class StageShape(LoadTestShape):
     def tick(self):
         run_time = self.get_run_time()
 
-        iteration = run_time // 10 + 1
-        return (iteration * 100, 100)
+        iteration = run_time // 30 + 1
+        return (iteration * 1000, 100)
 
 if __name__ == "__main__":
     # For step-by-step debugging

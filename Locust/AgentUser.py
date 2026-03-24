@@ -19,13 +19,13 @@ class AgentUser(User):
     """
     wait_time = constant(1)
     """
-    Pause between batches.
+    Pause between batches. Use =constant(N), and =between(M, N)
     """
-    batch_size: int = 10  # количество событий в батче
+    batch_size = constant(10)  # количество событий в батче
     """
-    Size of events batch to be sent.
+    Size of events batch to be sent. Default value shoud be taken from MC settings.
     """
-    token: str = 'SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ'
+    token: str = '6CNY4PEOL2QSVAIQHTOSRU3NIT34RCRUEIQURMEIJRD3DSX4JNDQ'
     """
     Token for Agent authentication.
     """
@@ -49,7 +49,7 @@ class AgentUser(User):
     def send_batch(self):
         self._confirmation_id += 1
         events = AgentMessageHelper.make_events_batch(
-            self.batch_size, self._confirmation_id)
+            self.batch_size(), self._confirmation_id)
 
         start_time = time.time()
         response_length = 0
@@ -97,6 +97,7 @@ class AgentUser(User):
         msg = AgentMessageHelper.read_sock_message(self.sock)
         while not '"m":"confirm"' in msg:
             max_try -= 1
+            
             if max_try <= 0:
                 return None
             msg = AgentMessageHelper.read_sock_message(self.sock)

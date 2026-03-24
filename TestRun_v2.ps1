@@ -22,8 +22,8 @@ function Run_LoadTest_v2 {
 
     python Agent_MaxLoad_v2.py --agents $Agents --event-batch $EventBatch `
         --save-to results_v2.csv --spawn-rate $SpawnRate `
-        --token SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ --host 127.0.0.1
-        # --token SEZVCZKTMIZBQ2PKRV5BAWWFYAKFS4CC26REFJEG3HRAHB6CYROQ --host 192.168.128.28
+        --token LAXKXE64FYRPOTTDOINEZLPPI2L3TAXHCFQHAAV5EBDV2UBQSWNQ --host 192.168.128.59
+        # --token JLE7EJNWIF653VMM6RNL66FEOBY5JUU4CXIPXILA2P3JDHK75NMQ --host 127.0.0.1
         
     if ($LASTEXITCODE -ne 0) { Write-Host "Python script failed"; exit 1 }
 }
@@ -34,10 +34,10 @@ Write-Host "Report will be saved to results_v2.csv"
 Write-Host "=============================="
 
 #Run_LoadTest_v2 -Agents 1 -EventBatch 1
-#Run_LoadTest_v2 -Agents 10 -EventBatch 1
-Run_LoadTest_v2 -Agents 100 -EventBatch 1
+#Run_LoadTest_v2 -Agents 10 -EventBatch 10
+Run_LoadTest_v2 -Agents 10 -EventBatch 1000
 #Run_LoadTest_v2 -Agents 200 -EventBatch 1 -SpawnRate 20
-#Run_LoadTest_v2 -Agents 300 -EventBatch 1 -SpawnRate 30
-#Run_LoadTest_v2 -Agents 500 -EventBatch 1 -SpawnRate 50
-#Run_LoadTest_v2 -Agents 700 -EventBatch 1 -SpawnRate 50
+#Run_LoadTest_v2 -Agents 300 -EventBatch 100 -SpawnRate 30
+#Run_LoadTest_v2 -Agents 500 -EventBatch 100 -SpawnRate 50
+#Run_LoadTest_v2 -Agents 700 -EventBatch 100 -SpawnRate 50
 #Run_LoadTest_v2 -Agents 1000 -EventBatch 1 -SpawnRate 100

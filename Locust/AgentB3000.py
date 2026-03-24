@@ -1,8 +1,9 @@
-from locust import run_single_user, constant, LoadTestShape
+from locust import constant, between
+from locust import run_single_user, LoadTestShape
 from AgentUser import AgentUser
 
 class AgentB3000(AgentUser):
-    batch_size = 3000
+    batch_size = constant(3000)
     wait_time = constant(1)
 
 class StageShape: #(LoadTestShape):
